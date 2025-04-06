@@ -1,16 +1,44 @@
 import React, { useState } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, ToastAndroid } from 'react-native';
 import { TextInput, Button } from 'react-native-paper';
 import * as DocumentPicker from 'expo-document-picker';
+import { registerUser } from '../lib/api';
 
 const SignUpScreen = ({ navigation }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [resume, setResume] = useState(null);
+  const [id, setId] = useState('');
 
-  const handleSignUp = () => {
-    console.log('Name:', name, 'Email:', email, 'Password:', password, 'Resume:', resume?.uri);
+  const handleSignUp = async () => {
+    if (!name || !id || !email || !password || !resume) {
+      ToastAndroid.show('Enter all the fields!', ToastAndroid.SHORT);
+      return;
+    }
+
+    const userData = {
+      name,
+      id,
+      email,
+      password,
+      resume: {
+        uri: resume.uri,
+        name: resume.name,
+        type: resume.mimeType || 'application/pdf',
+      },
+    };
+
+    // console.log(userData)
+
+    const result = await registerUser(userData);
+
+  if (result && result == 'success') {
+    ToastAndroid.show('registered successfully', ToastAndroid.SHORT);
+    navigation.navigate('Dashboard');
+  } else {
+    ToastAndroid.show('User already exit!', ToastAndroid.SHORT);
+  }
   };
 
   const pickResume = async () => {
@@ -34,6 +62,12 @@ const SignUpScreen = ({ navigation }) => {
         label="Name"
         value={name}
         onChangeText={setName}
+        style={{ marginBottom: 10 }}
+      />
+      <TextInput
+        label="Id"
+        value={id}
+        onChangeText={setId}
         style={{ marginBottom: 10 }}
       />
       <TextInput

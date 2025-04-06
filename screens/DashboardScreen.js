@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
   FlatList, StyleSheet, Linking
@@ -29,6 +30,17 @@ const postsData = [
 const DashboardScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredPosts, setFilteredPosts] = useState(postsData);
+
+  useEffect(()=>{
+    // (async () => {
+    //   try {
+    //     const value = await AsyncStorage.getItem("token");
+    //     console.log(value)
+    //   } catch (e) {
+    //     console.error('Failed to load data', e);
+    //   }
+    // })()
+  }, [])
 
   const handleSearch = (query) => {
     setSearchQuery(query);
