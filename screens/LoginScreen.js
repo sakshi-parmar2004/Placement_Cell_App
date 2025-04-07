@@ -1,52 +1,56 @@
 import React, { useState } from 'react';
-import { ToastAndroid, View } from 'react-native';
-import { TextInput, Button, Text } from 'react-native-paper';
+import { View, Image, ToastAndroid, Text , TextInput} from 'react-native';
+import { Button } from 'react-native-paper';
 import { loginUser } from '../lib/api';
-
-
-
 
 const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [id, setId] = useState('');
 
   const handleLogin = async () => {
-      const response = await loginUser(id, password);
-      if(response != null && response == "success") {
-        navigation.navigate('Dashboard');
-        ToastAndroid.show('logged in successfully', ToastAndroid.SHORT);
-      }else{
-        ToastAndroid.show('Incorrect Id or Password!', ToastAndroid.SHORT);
-      }
+    const response = await loginUser(id, password);
+    if (response != null && response === 'success') {
+      navigation.navigate('Dashboard');
+      ToastAndroid.show('Logged in successfully', ToastAndroid.SHORT);
+    } else {
+      ToastAndroid.show('Incorrect Id or Password!', ToastAndroid.SHORT);
+    }
   };
 
-
   return (
-    <View style={{ padding: 20, flex: 1, justifyContent: 'center' }}>
-      <Text variant="titleLarge" style={{ marginBottom: 20 }}>Login</Text>
+    <View className="flex-1 justify-center px-6 bg-white">
+      <View className="flex flex-col items-center mb-8">
+        <Image
+          source={require('../assets/logo.png')} // Make sure the image exists
+          className="w-24 h-24 "
+          resizeMode="contain"
+        />
+        <Text className="text-2xl font-bold text-gray-800">Login</Text>
+      </View>
+
       <TextInput
-      label = "Id"
-      value={id}
-      onChangeText={setId}
-      style={{marginBottom : 10}}
+        label="Id"
+        value={id}
+        onChangeText={setId}
+        className="mb-4 bg-white border rounded-md"
+        placeholder="Enter your ID"
       />
-      {/* <TextInput
-        label="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        style={{ marginBottom: 10 }}
-      /> */}
+
       <TextInput
         label="Password"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
-        style={{ marginBottom: 20 }}
+        className="mb-4 bg-white border rounded-md"
+        placeholder="Enter your ID"
+     
       />
-      <Button mode="contained" onPress={handleLogin}>Login</Button>
-      <Button onPress={() => navigation.navigate('SignUp')} style={{ marginTop: 10 }}>
+
+      <Button mode="contained" onPress={handleLogin} className="mb-4">
+        Login
+      </Button>
+
+      <Button onPress={() => navigation.navigate('SignUp')}>
         Don't have an account? Sign Up
       </Button>
     </View>

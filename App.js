@@ -8,6 +8,9 @@ import LoginScreen from './screens/LoginScreen';
 import SignUpScreen from './screens/SignUpScreen';
 import DashboardScreen from './screens/DashboardScreen';
 
+import "./global.css"
+
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
