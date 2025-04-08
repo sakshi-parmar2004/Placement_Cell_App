@@ -7,14 +7,17 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [id, setId] = useState('');
 
-  const handleLogin = async () => {
-    const response = await loginUser(id, password);
-    if (response != null && response === 'success') {
-      navigation.navigate('Dashboard');
-      ToastAndroid.show('Logged in successfully', ToastAndroid.SHORT);
-    } else {
-      ToastAndroid.show('Incorrect Id or Password!', ToastAndroid.SHORT);
-    }
+  const handleLogin =  () => {
+        navigation.navigate('Dashboard');
+
+     
+    // const response = await loginUser(id, password);
+    // if (response != null && response === 'success') {
+    //   navigation.navigate('Dashboard');
+    //   ToastAndroid.show('Logged in successfully', ToastAndroid.SHORT);
+    // } else {
+    //   ToastAndroid.show('Incorrect Id or Password!', ToastAndroid.SHORT);
+    // }
   };
 
   return (
@@ -33,7 +36,7 @@ const LoginScreen = ({ navigation }) => {
         value={id}
         onChangeText={setId}
         className="mb-4 bg-white border rounded-md"
-        placeholder="Enter your ID"
+        placeholder="Enter your Email Id"
       />
 
       <TextInput
@@ -42,7 +45,7 @@ const LoginScreen = ({ navigation }) => {
         onChangeText={setPassword}
         secureTextEntry
         className="mb-4 bg-white border rounded-md"
-        placeholder="Enter your ID"
+        placeholder="Enter your Password"
      
       />
 

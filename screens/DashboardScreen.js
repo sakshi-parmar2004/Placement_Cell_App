@@ -1,10 +1,11 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  FlatList, StyleSheet, Linking
+  FlatList, Linking
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Navbar from '../components/Navbar';
 
 const postsData = [
   {
@@ -31,16 +32,12 @@ const DashboardScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredPosts, setFilteredPosts] = useState(postsData);
 
-  useEffect(()=>{
+  useEffect(() => {
     // (async () => {
-    //   try {
-    //     const value = await AsyncStorage.getItem("token");
-    //     console.log(value)
-    //   } catch (e) {
-    //     console.error('Failed to load data', e);
-    //   }
-    // })()
-  }, [])
+    //   const value = await AsyncStorage.getItem("token");
+    //   console.log(value);
+    // })();
+  }, []);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -51,76 +48,28 @@ const DashboardScreen = () => {
   };
 
   const renderPostItem = ({ item }) => (
-    <View style={styles.postCard}>
-      <Text style={styles.companyName}>{item.companyName}</Text>
-      <Text style={styles.postDetails}>{item.postDetails}</Text>
+    <View className="bg-white p-4 rounded-xl mb-3 shadow-sm">
+      <Text className="text-lg font-semibold text-gray-800">{item.companyName}</Text>
+      <Text className="text-sm text-gray-600 mt-1">{item.postDetails}</Text>
       <TouchableOpacity onPress={() => Linking.openURL(item.pdfUrl)}>
-        <Text style={styles.pdfLink}>View Job Details (PDF)</Text>
+        <Text className="text-blue-600 underline mt-3 text-sm">View Job Details (PDF)</Text>
       </TouchableOpacity>
     </View>
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.navbar}>
-        <Icon name="user" size={25} color="#fff" />
-        <TextInput
-          style={styles.searchBar}
-          placeholder="Search by Company Name"
-          value={searchQuery}
-          onChangeText={handleSearch}
-        />
-        <View style={styles.iconsContainer}>
-          <Icon name="bell" size={25} color="#fff" />
-          <Icon name="sign-out" size={25} color="#fff" />
-        </View>
-      </View>
+    <View className="flex-1 bg-gray-100 p-4">
+      <Navbar />
+     
 
       <FlatList
         data={filteredPosts}
         keyExtractor={item => item.id}
         renderItem={renderPostItem}
-        contentContainerStyle={styles.postList}
+        contentContainerStyle={{ padding: 16 }}
       />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f7f7f7' },
-  navbar: {
-    flexDirection: 'row',
-    padding: 10,
-    backgroundColor: '#333',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  searchBar: {
-    flex: 1,
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 10,
-    marginHorizontal: 10,
-  },
-  iconsContainer: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  postList: { padding: 10 },
-  postCard: {
-    backgroundColor: '#fff',
-    padding: 15,
-    marginVertical: 5,
-    borderRadius: 8,
-    elevation: 2,
-  },
-  companyName: { fontSize: 18, fontWeight: 'bold' },
-  postDetails: { marginTop: 5, fontSize: 14, color: '#555' },
-  pdfLink: {
-    color: '#1e88e5',
-    marginTop: 10,
-    textDecorationLine: 'underline',
-  },
-});
 
 export default DashboardScreen;
