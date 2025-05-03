@@ -9,7 +9,9 @@ import SignUpScreen from './screens/SignUpScreen';
 import DashboardScreen from './screens/DashboardScreen';
 
 import "./global.css"
-import CoordinatorDash from './screens/CoordinatorDash';
+import NotificationScreen from './screens/Notification';
+import ProfileScreen from './screens/Profile';
+import CoordinatorProfileScreen from './screens/CoordinatorDash';
 
 
 const Stack = createNativeStackNavigator();
@@ -23,7 +25,9 @@ export default function App() {
   <Stack.Screen name="Login" component={LoginScreen} />
   <Stack.Screen name="SignUp" component={SignUpScreen} />
   <Stack.Screen name="Dashboard" component={DashboardScreen} />
-  <Stack.Screen name="CoordinatorDashboard" component={CoordinatorDash} />
+  <Stack.Screen name="CoordinatorDashboard" component={CoordinatorProfileScreen} />
+  <Stack.Screen name="Notification" component={NotificationScreen} />
+  <Stack.Screen name="Profile" component={ProfileScreen} />
 </Stack.Navigator>
       </NavigationContainer>
     </PaperProvider>
