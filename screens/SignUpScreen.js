@@ -3,6 +3,7 @@ import { View, Text, ToastAndroid, Image , TextInput  } from 'react-native';
 import {   Switch ,Button } from 'react-native-paper';
 import * as DocumentPicker from 'expo-document-picker';
 import { registerUser } from '../lib/api';
+import { useUserRole } from '../context/AppContext';
 
 
 const SignUpScreen = ({ navigation }) => {
@@ -11,7 +12,8 @@ const SignUpScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [resume, setResume] = useState(null);
   const [id, setId] = useState('');
-  const [isCoordinator, setIsCoordinator] = useState(false);
+  // const [isCoordinator, setIsCoordinator] = useState(false);
+  const {isCoordinator , setIsCoordinator} = useUserRole();
 
   const handleSignUp = async () => {
     if (!name || !id || !email || !password || !resume) {
@@ -36,7 +38,7 @@ const SignUpScreen = ({ navigation }) => {
 
     if (result && result === 'success') {
       ToastAndroid.show('Registered successfully', ToastAndroid.SHORT);
-      navigation.navigate('Dashboard');
+      navigation.navigate('Home');
     } else {
       ToastAndroid.show('User already exists!', ToastAndroid.SHORT);
     }

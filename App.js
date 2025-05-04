@@ -10,8 +10,10 @@ import DashboardScreen from './screens/DashboardScreen';
 
 import "./global.css"
 import NotificationScreen from './screens/Notification';
-import ProfileScreen from './screens/Profile';
-import CoordinatorProfileScreen from './screens/CoordinatorDash';
+import ProfileScreen from './screens/userprofile';
+import CoordinatorProfileScreen from './screens/coordinator_profile';
+import { UserRoleProvider } from './context/AppContext';
+import HomePage from './screens/HomePage';
 
 
 const Stack = createNativeStackNavigator();
@@ -19,17 +21,21 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <PaperProvider>
+    <UserRoleProvider>
       <NavigationContainer>
       <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
   <Stack.Screen name="Splash" component={SplashScreen} />
   <Stack.Screen name="Login" component={LoginScreen} />
   <Stack.Screen name="SignUp" component={SignUpScreen} />
   <Stack.Screen name="Dashboard" component={DashboardScreen} />
-  <Stack.Screen name="CoordinatorDashboard" component={CoordinatorProfileScreen} />
+  <Stack.Screen name="coordinator_profile" component={CoordinatorProfileScreen} />
   <Stack.Screen name="Notification" component={NotificationScreen} />
-  <Stack.Screen name="Profile" component={ProfileScreen} />
+  <Stack.Screen name="userprofile" component={ProfileScreen} />
+  <Stack.Screen name="Home" component={HomePage} />
+
 </Stack.Navigator>
       </NavigationContainer>
+      </UserRoleProvider>
     </PaperProvider>
   );
 }

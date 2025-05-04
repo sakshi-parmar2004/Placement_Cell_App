@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { TextInput, View, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native'; // <-- Add this
+import { useUserRole } from '../context/AppContext';
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const navigation = useNavigation(); // <-- Navigation hook
+  const { isCoordinator } = useUserRole(); // Assuming you have a context or prop for user role
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -13,9 +15,19 @@ const Navbar = () => {
   };
 
   return (
-    <View className="flex-row items-center justify-between  bg-blue-200 p-5 my-10 rounded-2xl">
+    <View className="flex-row items-center justify-between  bg-blue-500 p-5 my-10 rounded-2xl">
       {/* User Icon */}
-      <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+      <TouchableOpacity
+  onPress={() => {
+    if (isCoordinator) {
+      navigation.navigate('coordinator_profile');
+    } else {
+      navigation.navigate('userprofile'); // Adjust this to your user profile screen
+    }
+  }}
+  className="bg-blue-600 p-3 rounded-full"
+>
+  
 
         <MaterialIcons name="person" size={25} color="#fff" />
       </TouchableOpacity>
@@ -40,7 +52,7 @@ const Navbar = () => {
           <MaterialIcons name="notifications" size={25} color="#fff" />
         </TouchableOpacity>
 
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <MaterialIcons name="logout" size={25} color="#fff" />
         </TouchableOpacity>
       </View>
