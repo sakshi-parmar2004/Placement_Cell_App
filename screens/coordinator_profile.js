@@ -1,33 +1,66 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   Image,
   TouchableOpacity,
   Linking,
-  ScrollView,
   FlatList,
   Alert,
   TextInput,
+  ScrollView,
 } from 'react-native';
+import { Feather } from "@expo/vector-icons";
 import Navbar from '../components/Navbar';
 import * as FileSystem from 'expo-file-system';
-import * as DocumentPicker from 'expo-document-picker';
+import * as ImagePicker from 'expo-image-picker';
 import * as Sharing from 'expo-sharing';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getMyPosts, uploadJobNotice } from '../lib/api';
 
 const CoordinatorProfileScreen = () => {
-  const [userData] = useState({
+  const [userData, setUserData] = useState({
     name: 'Jane Doe',
-    profileImage: 'https://i.pravatar.cc/300',
-    skills: ['React', 'Node.js', 'MongoDB', 'JavaScript'],
+    id: '00000',
+    email: 'email@example.com',
+    skills: [],
     resumeUrl: 'https://example.com/jane_doe_resume.pdf',
   });
 
   const [jobTitle, setJobTitle] = useState('');
   const [jobDetails, setJobDetails] = useState('');
-  const [pdfUri, setPdfUri] = useState(null);
+  const [imageUri, setImageUri] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [userId, setUserId] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      const userString = await AsyncStorage.getItem('user');
+      if (userString) {
+        const user = JSON.parse(userString);
+        setUserData({
+          name: user.name,
+          id: user.id,
+          email: user.email,
+          skills: user.skills || [],
+          resumeUrl: user.resume,
+        });
+        console.log(user._id)
+        console.log("post lists")
+        setUserId(user._id);
+        const postList = await getMyPosts(user._id);
+        console.log(postList)
+      }
+    })();
+
+  }, []);
+
+  const handleEdit = (item) => {
+    // Example: Navigate to edit screen with the post data
+    navigation.navigate("EditJobScreen", { post: item });
+  };
+  
 
   const handleOpenResume = async () => {
     try {
@@ -45,136 +78,203 @@ const CoordinatorProfileScreen = () => {
     }
   };
 
-  const pickPdf = async () => {
+  const pickImage = async () => {
     try {
-      const result = await DocumentPicker.getDocumentAsync({ type: 'application/pdf' });
-
-      if (result.type === 'success') {
-        setPdfUri(result.uri);
-      } else {
-        Alert.alert('Error', 'PDF selection failed');
-      }
+      Alert.alert('Choose Option', 'Select image from:', [
+        {
+          text: 'Camera',
+          onPress: async () => {
+            const result = await ImagePicker.launchCameraAsync({
+              mediaTypes: ImagePicker.MediaTypeOptions.Images,
+              allowsEditing: true,
+              quality: 1,
+            });
+            if (!result.canceled) {
+              setImageUri(result.assets[0].uri);
+            }
+          },
+        },
+        {
+          text: 'Gallery',
+          onPress: async () => {
+            const result = await ImagePicker.launchImageLibraryAsync({
+              mediaTypes: ImagePicker.MediaTypeOptions.Images,
+              allowsEditing: true,
+              quality: 1,
+            });
+            if (!result.canceled) {
+              setImageUri(result.assets[0].uri);
+            }
+          },
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Failed to pick the PDF');
+      Alert.alert('Error', 'Image selection failed');
     }
   };
 
-  const handleAddPost = () => {
-    if (!jobTitle || !jobDetails || !pdfUri) {
-      Alert.alert('Error', 'Please fill out all fields and upload a PDF');
+  const handleAddPost = async () => {
+    if (!imageUri) {
+      Alert.alert('Error', 'Please upload an image.');
       return;
     }
-
-    const newPost = {
-      id: Date.now().toString(),
-      jobTitle,
-      jobDetails,
-      pdfUri,
+  
+    const postPayload = {
+      userId,
+      title: jobTitle,
+      description: jobDetails,
+      notice: {
+        uri: imageUri,
+        type: 'image/jpeg',
+        name: 'job_notice.jpg',
+      },
     };
-
-    setPosts([newPost, ...posts]);
+  
+    const uploadedPost = await uploadJobNotice(postPayload);
+  
+    if (!uploadedPost) {
+      Alert.alert('Error', 'Failed to upload job post');
+      return;
+    }
+  
+    setPosts([uploadedPost, ...posts]);
     setJobTitle('');
     setJobDetails('');
-    setPdfUri(null);
-  };
+    setImageUri(null);
+  }; // Ensure this is installed
 
   const renderPostItem = ({ item }) => (
-    <View className="bg-white p-4 mb-4 rounded-lg shadow-md">
-      <Text className="text-lg font-bold text-gray-800">{item.jobTitle}</Text>
-      <Text className="text-gray-600 mt-1">{item.jobDetails}</Text>
-      <TouchableOpacity onPress={() => Linking.openURL(item.pdfUri)}>
-        <Text className="text-blue-600 mt-3">View Job Details (PDF)</Text>
+    <View className="bg-white p-4 mb-4 rounded-2xl shadow-md border border-gray-200 relative">
+      {/* Edit Icon */}
+      <TouchableOpacity
+        className="absolute top-3 right-3 z-10"
+        onPress={() => handleEdit(item)}
+      >
+        <Feather name="edit-2" size={20} color="#4B5563" />
       </TouchableOpacity>
+  
+      <Text className="text-xl font-semibold text-gray-900">{item.title}</Text>
+      <Text className="text-base text-gray-700 mt-1">{item.company} • {item.location}</Text>
+  
+      <View className="flex-row flex-wrap mt-2 space-x-2">
+        <Text className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+          Package: {item.package}
+        </Text>
+        <Text className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">
+          Last Date: {item.last_date_to_apply}
+        </Text>
+      </View>
+  
+      <Text className="text-gray-600 mt-3">{item.description}</Text>
+  
+      <TouchableOpacity
+        onPress={() => Linking.openURL(item.notice_url)}
+        className="mt-4"
+      >
+        <Text className="text-blue-600 underline">View Job Notice (Image)</Text>
+      </TouchableOpacity>
+  
+      {item.apply_link && (
+        <TouchableOpacity
+          onPress={() => Linking.openURL(item.apply_link)}
+          className="mt-3 bg-blue-600 rounded-full py-2"
+        >
+          <Text className="text-center text-white font-medium">Apply Now</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+  
+
+  const renderHeader = () => (
+    <View className="p-5 bg-gray-100">
+      {/* Profile Section */}
+      <View className="items-center mb-6">
+        <Image
+          source={{ uri: 'https://i.pravatar.cc/300' }}
+          className="w-28 h-28 rounded-full"
+        />
+        <Text className="text-xl font-bold text-gray-800 mt-3">
+          {userData.name}
+        </Text>
+      </View>
+
+      {/* Skills Section */}
+      <Text className="text-lg font-semibold text-gray-800 mb-3">Skills</Text>
+      <View className="flex-row flex-wrap mb-6">
+        {userData.skills.map((skill, index) => (
+          <Text
+            key={index}
+            className="bg-blue-500 text-white px-4 py-1 rounded-full mr-2 mb-2"
+          >
+            {skill}
+          </Text>
+        ))}
+      </View>
+
+      {/* Resume Button */}
+      <TouchableOpacity
+        onPress={handleOpenResume}
+        className="bg-gray-600 py-3 rounded-md items-center mb-8"
+      >
+        <Text className="text-white font-semibold">View Resume (PDF)</Text>
+      </TouchableOpacity>
+
+      {/* Job Posting Form */}
+      <Text className="text-xl font-bold mb-4 text-gray-800">Post a New Job</Text>
+      <TextInput
+        placeholder="Job Title - Optional"
+        value={jobTitle}
+        onChangeText={setJobTitle}
+        className="bg-white p-3 rounded-md mb-4"
+      />
+      <TextInput
+        placeholder="Job Details - Optional"
+        multiline
+        value={jobDetails}
+        onChangeText={setJobDetails}
+        className="bg-white p-3 rounded-md mb-4 min-h-[80px] text-gray-700"
+      />
+      <TouchableOpacity
+        onPress={pickImage}
+        className="bg-gray-600 flex-row items-center justify-center py-3 rounded-md mb-5"
+      >
+        <Ionicons name="image" size={22} color="white" />
+        <Text className="text-white ml-2">
+          {imageUri ? 'Image Selected' : 'Upload Job Image'}
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={handleAddPost}
+        className="bg-blue-500 py-3 rounded-md items-center mb-8"
+      >
+        <Text className="text-white font-bold">Add Job Post</Text>
+      </TouchableOpacity>
+
+      <Text className="text-xl font-bold mb-4 text-gray-800">All Job Posts</Text>
     </View>
   );
 
   return (
     <View className="flex-1 bg-gray-100">
       <Navbar />
-      <ScrollView contentContainerStyle={{ padding: 20 }}>
-        {/* Profile */}
-        <View className="items-center mb-6">
-          <Image
-            source={{ uri: userData.profileImage }}
-            className="w-28 h-28 rounded-full"
-          />
-          <Text className="text-xl font-bold text-gray-800 mt-3">
-            {userData.name}
-          </Text>
-        </View>
-
-        {/* Skills */}
-        <Text className="text-lg font-semibold text-gray-800 mb-3">Skills</Text>
-        <View className="flex-row flex-wrap mb-6">
-          {userData.skills.map((skill, index) => (
-            <Text
-              key={index}
-              className="bg-blue-500 text-white px-4 py-1 rounded-full mr-2 mb-2"
-            >
-              {skill}
-            </Text>
-          ))}
-        </View>
-
-        {/* Resume */}
-        <TouchableOpacity
-          onPress={handleOpenResume}
-          className="bg-gray-600 py-3 rounded-md items-center mb-8"
-        >
-          <Text className="text-white font-semibold">View Resume (PDF)</Text>
-        </TouchableOpacity>
-
-        {/* New Job Post */}
-        <Text className="text-xl font-bold mb-4 text-gray-800">Post a New Job</Text>
-
-        <TextInput
-          placeholder="Job Title"
-          value={jobTitle}
-          onChangeText={setJobTitle}
-          className="bg-white p-3 rounded-md mb-4"
-        />
-
-        <TextInput
-          placeholder="Job Details"
-          multiline
-          value={jobDetails}
-          onChangeText={setJobDetails}
-          className="bg-white p-3 rounded-md mb-4 min-h-[80px] text-gray-700"
-        />
-
-        <TouchableOpacity
-          onPress={pickPdf}
-          className="bg-gray-600 flex-row items-center justify-center py-3 rounded-md mb-5"
-        >
-          <Ionicons name="document-attach" size={22} color="white" />
-          <Text className="text-white ml-2">
-            {pdfUri ? 'PDF Selected' : 'Attach PDF'}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={handleAddPost}
-          className="bg-blue-500 py-3 rounded-md items-center mb-8"
-        >
-          <Text className="text-white font-bold">Add Job Post</Text>
-        </TouchableOpacity>
-
-        {/* Job Posts */}
-        <Text className="text-xl font-bold mb-4 text-gray-800">All Job Posts</Text>
-
-        {posts.length === 0 ? (
-          <Text className="text-center text-gray-500 mt-4">No job posts added yet.</Text>
-        ) : (
-          <FlatList
-            data={posts}
-            keyExtractor={(item) => item.id}
-            renderItem={renderPostItem}
-          />
-        )}
+  
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}>
+        {renderHeader()}
+  
+        {posts.map((item, index) => (
+          <View key={index}>
+            {renderPostItem({ item })}
+          </View>
+        ))}
       </ScrollView>
     </View>
   );
+  
+  
 };
 
 export default CoordinatorProfileScreen;

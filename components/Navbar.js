@@ -1,18 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TextInput, View, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native'; // <-- Add this
 import { useUserRole } from '../context/AppContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const navigation = useNavigation(); // <-- Navigation hook
-  const { isCoordinator } = useUserRole(); // Assuming you have a context or prop for user role
+  const [isCoordinator, setIsCoordinator] = useState(true);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
     // Add your search logic here
   };
+
+  useEffect(()=>{
+    (async () => {
+      const userData = await AsyncStorage.getItem('user');
+      const user = JSON.parse(userData);
+      setIsCoordinator(user.isCoordinator);
+    })()
+  }, [])
+
+
+  const logoutHandler = async ()=>{
+    await AsyncStorage.removeItem('user')
+    await AsyncStorage.removeItem('token')
+    navigation.navigate('Login')
+  }
 
   return (
     <View className="flex-row items-center justify-between  bg-blue-500 p-5 my-10 rounded-2xl">
@@ -52,7 +68,7 @@ const Navbar = () => {
           <MaterialIcons name="notifications" size={25} color="#fff" />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+        <TouchableOpacity onPress={logoutHandler}>
           <MaterialIcons name="logout" size={25} color="#fff" />
         </TouchableOpacity>
       </View>
