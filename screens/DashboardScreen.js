@@ -5,60 +5,18 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '../components/Navbar';
-
-const postsData = [
-  {
-    id: '1',
-    companyName: 'ABC Corp',
-    postDetails: 'On-campus placement drive on 10th April 2025',
-    pdfUrl: 'https://example.com/job1.pdf',
-    jobSummary: 'Role: Software Developer\nLocation: Bangalore\nPackage: ₹6 LPA',
-    companyIcon: 'https://via.placeholder.com/50x50.png?text=ABC',
-  },
-  {
-    id: '2',
-    companyName: 'XYZ Ltd',
-    postDetails: 'Hiring for Software Engineers on 15th April 2025',
-    pdfUrl: 'https://example.com/job2.pdf',
-    jobSummary: 'Role: Frontend Engineer\nLocation: Remote\nPackage: ₹5 LPA',
-    companyIcon: 'https://via.placeholder.com/50x50.png?text=XYZ',
-  },
-  {
-    id: '3',
-    companyName: 'Tech Innovations',
-    postDetails: 'Placement drive for freshers on 20th April 2025',
-    pdfUrl: 'https://example.com/job3.pdf',
-    jobSummary: 'Role: QA Tester\nLocation: Pune\nPackage: ₹4.5 LPA',
-    companyIcon: 'https://via.placeholder.com/50x50.png?text=TI',
-  },
-  {
-    id: '4',
-    companyName: 'Google',
-    postDetails: 'Hiring for Software Engineers on 15th April 2025',
-    pdfUrl: 'https://example.com/job2.pdf',
-    jobSummary: 'Role: Frontend Engineer\nLocation: Remote\nPackage: ₹50 LPA',
-    companyIcon: 'https://via.placeholder.com/50x50.png?text=XYZ',
-  },
-  {
-    id: '5',
-    companyName: 'Microsoft',
-    postDetails: 'Placement drive for freshers on 20th April 2025',
-    pdfUrl: 'https://example.com/job3.pdf',
-    jobSummary: 'Role: QA Tester\nLocation: Pune\nPackage: ₹40.5 LPA',
-    companyIcon: 'https://via.placeholder.com/50x50.png?text=TI',
-  },
-];
+import { getAllNotices } from '../lib/api';
 
 const DashboardScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredPosts, setFilteredPosts] = useState(postsData);
+  const [filteredPosts, setFilteredPosts] = useState([]);
 
   useEffect(() => {
     // Uncomment for token retrieval
-    // (async () => {
-    //   const value = await AsyncStorage.getItem("token");
-    //   console.log(value);
-    // })();
+    (async () => {
+      const value = await getAllNotices();
+      setFilteredPosts(value)
+    })();
   }, []);
 
   const handleSearch = (query) => {
@@ -70,21 +28,55 @@ const DashboardScreen = () => {
   };
 
   const renderPostItem = ({ item }) => (
-    <View className="bg-white p-4 rounded-xl mb-4 shadow-sm flex-row">
-      <Image
-        source={{ uri: item.companyIcon }}
-        style={{ width: 50, height: 50, borderRadius: 8, marginRight: 12 }}
-      />
-      <View style={{ flex: 1 }}>
-        <Text className="text-lg font-semibold text-gray-800">{item.companyName}</Text>
-        <Text className="text-sm text-gray-600 mt-1">{item.postDetails}</Text>
-        <Text className="text-sm text-gray-700 mt-2">{item.jobSummary}</Text>
-        <TouchableOpacity onPress={() => Linking.openURL(item.pdfUrl)}>
-          <Text className="text-blue-600 underline mt-3 text-sm">View Job Details (PDF)</Text>
-        </TouchableOpacity>
+    <View className="bg-white p-4 mb-4 rounded-2xl shadow-md border border-gray-200 relative">
+  
+      {/* User Info */}
+      <View className="flex-row items-center mb-3">
+        {/* Avatar Circle */}
+        <View className="w-8 h-8 rounded-full bg-gray-300 items-center justify-center mr-2">
+          <Text className="text-gray-800 font-semibold">
+            {item.user?.name?.charAt(0).toUpperCase() || "U"}
+          </Text>
+        </View>
+        <View>
+          <Text className="text-sm font-medium text-gray-700">{item.user?.name || "Unknown"}</Text>
+          <Text className="text-xs text-gray-500">Student ID: {item.user?.id || "-"}</Text>
+        </View>
       </View>
+  
+      {/* Job Info */}
+      <Text className="text-xl font-semibold text-gray-900">{item.title}</Text>
+      <Text className="text-base text-gray-700 mt-1">{item.company} • {item.location}</Text>
+  
+      <View className="flex-row flex-wrap mt-2 space-x-2">
+        <Text className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+          Package: {item.package}
+        </Text>
+        <Text className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">
+          Last Date: {item.last_date_to_apply}
+        </Text>
+      </View>
+  
+      <Text className="text-gray-600 mt-3">{item.description || 'No description provided.'}</Text>
+  
+      <TouchableOpacity
+        onPress={() => Linking.openURL(item.notice_url)}
+        className="mt-4"
+      >
+        <Text className="text-blue-600 underline">View Job Notice (Image)</Text>
+      </TouchableOpacity>
+  
+      {item.apply_link && (
+        <TouchableOpacity
+          onPress={() => Linking.openURL(item.apply_link)}
+          className="mt-3 bg-blue-600 rounded-full py-2"
+        >
+          <Text className="text-center text-white font-medium">Apply Now</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
+  
 
   return (
     <View className="flex-1 bg-gray-100">
@@ -92,7 +84,7 @@ const DashboardScreen = () => {
   
       <FlatList
         data={filteredPosts}
-        keyExtractor={item => item.id}
+        keyExtractor={(item, index) => item.id?.toString() || `item-${index}`}
         renderItem={renderPostItem}
         contentContainerStyle={{ padding: 16 }}
       />

@@ -5,7 +5,7 @@ import DashboardScreen from './DashboardScreen'; // Assuming this is the user da
 const HomePage = () => {
 
   return (
-    <View className="flex-1 bg-gray-100 px-4 py-6">
+    <View className="flex-1 bg-gray-100 ">
       <View className="flex-1">
         <DashboardScreen />
       </View>

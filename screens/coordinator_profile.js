@@ -18,6 +18,7 @@ import * as Sharing from 'expo-sharing';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getMyPosts, uploadJobNotice } from '../lib/api';
+import { ActivityIndicator } from 'react-native';
 
 const CoordinatorProfileScreen = () => {
   const [userData, setUserData] = useState({
@@ -27,7 +28,7 @@ const CoordinatorProfileScreen = () => {
     skills: [],
     resumeUrl: 'https://example.com/jane_doe_resume.pdf',
   });
-
+  const [loading, setLoading] = useState(false);
   const [jobTitle, setJobTitle] = useState('');
   const [jobDetails, setJobDetails] = useState('');
   const [imageUri, setImageUri] = useState(null);
@@ -46,11 +47,9 @@ const CoordinatorProfileScreen = () => {
           skills: user.skills || [],
           resumeUrl: user.resume,
         });
-        console.log(user._id)
-        console.log("post lists")
         setUserId(user._id);
         const postList = await getMyPosts(user._id);
-        console.log(postList)
+        setPosts(postList)
       }
     })();
 
@@ -121,29 +120,38 @@ const CoordinatorProfileScreen = () => {
       return;
     }
   
-    const postPayload = {
-      userId,
-      title: jobTitle,
-      description: jobDetails,
-      notice: {
-        uri: imageUri,
-        type: 'image/jpeg',
-        name: 'job_notice.jpg',
-      },
-    };
+    setLoading(true);
   
-    const uploadedPost = await uploadJobNotice(postPayload);
+    try {
+      const postPayload = {
+        userId,
+        title: jobTitle,
+        description: jobDetails,
+        notice: {
+          uri: imageUri,
+          type: 'image/jpeg',
+          name: 'job_notice.jpg',
+        },
+      };
   
-    if (!uploadedPost) {
-      Alert.alert('Error', 'Failed to upload job post');
-      return;
+      const uploadedPost = await uploadJobNotice(postPayload);
+      if (!uploadedPost) {
+        Alert.alert('Error', 'Failed to upload job post');
+        return;
+      }
+  
+      setPosts([uploadedPost, ...posts]);
+      setJobTitle('');
+      setJobDetails('');
+      setImageUri(null);
+    } catch (error) {
+      Alert.alert('Error', 'Something went wrong while uploading');
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
+  };
   
-    setPosts([uploadedPost, ...posts]);
-    setJobTitle('');
-    setJobDetails('');
-    setImageUri(null);
-  }; // Ensure this is installed
 
   const renderPostItem = ({ item }) => (
     <View className="bg-white p-4 mb-4 rounded-2xl shadow-md border border-gray-200 relative">
@@ -189,88 +197,108 @@ const CoordinatorProfileScreen = () => {
   
 
   const renderHeader = () => (
-    <View className="p-5 bg-gray-100">
+    <View className="p-5 bg-white rounded-3xl shadow-md mb-5 mt-5">
       {/* Profile Section */}
       <View className="items-center mb-6">
         <Image
           source={{ uri: 'https://i.pravatar.cc/300' }}
-          className="w-28 h-28 rounded-full"
+          className="w-28 h-28 rounded-full border-4 border-blue-500"
         />
-        <Text className="text-xl font-bold text-gray-800 mt-3">
-          {userData.name}
-        </Text>
+        <Text className="text-2xl font-bold text-gray-800 mt-3">{userData.name}</Text>
+        <Text className="text-gray-500 text-base">{userData.email}</Text>
       </View>
-
+  
+      {/* Divider */}
+      <View className="h-px bg-gray-200 my-4" />
+  
       {/* Skills Section */}
       <Text className="text-lg font-semibold text-gray-800 mb-3">Skills</Text>
       <View className="flex-row flex-wrap mb-6">
-        {userData.skills.map((skill, index) => (
-          <Text
-            key={index}
-            className="bg-blue-500 text-white px-4 py-1 rounded-full mr-2 mb-2"
-          >
-            {skill}
-          </Text>
-        ))}
+        {userData.skills.length > 0 ? (
+          userData.skills.map((skill, index) => (
+            <Text
+              key={index}
+              className="bg-blue-100 text-blue-800 px-4 py-1 rounded-full mr-2 mb-2 text-sm"
+            >
+              {skill}
+            </Text>
+          ))
+        ) : (
+          <Text className="text-gray-500 italic">No skills added</Text>
+        )}
       </View>
-
+  
       {/* Resume Button */}
       <TouchableOpacity
         onPress={handleOpenResume}
-        className="bg-gray-600 py-3 rounded-md items-center mb-8"
+        className="bg-blue-600 py-3 rounded-xl items-center mb-8 shadow-sm"
       >
-        <Text className="text-white font-semibold">View Resume (PDF)</Text>
+        <Text className="text-white font-semibold text-base">View Resume (PDF)</Text>
       </TouchableOpacity>
-
+  
+      {/* Divider */}
+      <View className="h-px bg-gray-200 my-4" />
+  
       {/* Job Posting Form */}
       <Text className="text-xl font-bold mb-4 text-gray-800">Post a New Job</Text>
       <TextInput
-        placeholder="Job Title - Optional"
+        placeholder="Job Title (optional)"
         value={jobTitle}
         onChangeText={setJobTitle}
-        className="bg-white p-3 rounded-md mb-4"
+        className="bg-gray-100 p-3 rounded-xl mb-4 text-gray-800"
       />
       <TextInput
-        placeholder="Job Details - Optional"
+        placeholder="Job Details (optional)"
         multiline
         value={jobDetails}
         onChangeText={setJobDetails}
-        className="bg-white p-3 rounded-md mb-4 min-h-[80px] text-gray-700"
+        className="bg-gray-100 p-3 rounded-xl mb-4 min-h-[80px] text-gray-800"
       />
       <TouchableOpacity
         onPress={pickImage}
-        className="bg-gray-600 flex-row items-center justify-center py-3 rounded-md mb-5"
+        className="bg-gray-700 flex-row items-center justify-center py-3 rounded-xl mb-5 shadow"
       >
         <Ionicons name="image" size={22} color="white" />
-        <Text className="text-white ml-2">
+        <Text className="text-white ml-2 font-medium">
           {imageUri ? 'Image Selected' : 'Upload Job Image'}
         </Text>
       </TouchableOpacity>
-
+  
       <TouchableOpacity
         onPress={handleAddPost}
-        className="bg-blue-500 py-3 rounded-md items-center mb-8"
+        className={`py-3 rounded-xl items-center mb-4 shadow ${
+          loading ? 'bg-gray-400' : 'bg-green-600'
+        }`}
+        disabled={loading}
       >
-        <Text className="text-white font-bold">Add Job Post</Text>
+        {loading ? (
+          <ActivityIndicator size="small" color="#fff" />
+        ) : (
+          <Text className="text-white font-bold">Add Job Post</Text>
+        )}
       </TouchableOpacity>
 
-      <Text className="text-xl font-bold mb-4 text-gray-800">All Job Posts</Text>
+      {/* Divider */}
+      <View className="h-px bg-gray-200 my-4" />
+  
+      <Text className="text-xl font-bold mb-2 text-gray-800">All Job Posts</Text>
     </View>
   );
+  
 
   return (
     <View className="flex-1 bg-gray-100">
       <Navbar />
-  
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}>
-        {renderHeader()}
-  
-        {posts.map((item, index) => (
-          <View key={index}>
-            {renderPostItem({ item })}
-          </View>
-        ))}
-      </ScrollView>
+      <FlatList
+        ListHeaderComponent={renderHeader}
+        data={posts}
+        keyExtractor={(item, index) => item._id || index.toString()}
+        renderItem={renderPostItem}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}
+        ListEmptyComponent={
+          <Text className="text-gray-600 text-center mt-10">No job posts found.</Text>
+        }
+      />
     </View>
   );
   

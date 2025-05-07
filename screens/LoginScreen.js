@@ -12,7 +12,12 @@ const LoginScreen = ({ navigation }) => {
     // Simple check to navigate to the right page
     const response = await loginUser(id, password);
     if (response != null && response === 'success') {
-      navigation.navigate('Home');
+      // navigation.navigate('Home');\
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Dashboard' }],
+      });
+      
       ToastAndroid.show('Logged in successfully', ToastAndroid.SHORT);
     } else {
       ToastAndroid.show('Incorrect Id or Password!', ToastAndroid.SHORT);
