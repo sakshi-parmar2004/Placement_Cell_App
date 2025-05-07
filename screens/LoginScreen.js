@@ -1,29 +1,22 @@
 import React, { useState } from 'react';
 import { View, Image, ToastAndroid, Text, TextInput } from 'react-native';
 import { Button } from 'react-native-paper';
-import { useUserRole } from '../context/AppContext';
+import { loginUser } from '../lib/api';
 
 const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [id, setId] = useState('');
-  const {isCoordinator, setIsCoordinator} = useUserRole(); // State to manage coordinator status
 
   // Function to handle login logic
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // Simple check to navigate to the right page
-    
-      navigation.navigate('Dashboard');
-   
-
-    // You can add your login API request logic here later
-    // Example:
-    // const response = await loginUser(id, password);
-    // if (response != null && response === 'success') {
-    //   navigation.navigate(isCoordinator ? 'CoordinatorDashboard' : 'UserDashboard');
-    //   ToastAndroid.show('Logged in successfully', ToastAndroid.SHORT);
-    // } else {
-    //   ToastAndroid.show('Incorrect Id or Password!', ToastAndroid.SHORT);
-    // }
+    const response = await loginUser(id, password);
+    if (response != null && response === 'success') {
+      navigation.navigate('Home');
+      ToastAndroid.show('Logged in successfully', ToastAndroid.SHORT);
+    } else {
+      ToastAndroid.show('Incorrect Id or Password!', ToastAndroid.SHORT);
+    }
   };
 
   return (
@@ -43,7 +36,7 @@ const LoginScreen = ({ navigation }) => {
         value={id}
         onChangeText={setId}
         className="mb-4 bg-white border rounded-md"
-        placeholder="Enter your Email Id"
+        placeholder="Enter your Student Id"
       />
 
       {/* Password Input */}
@@ -55,15 +48,6 @@ const LoginScreen = ({ navigation }) => {
         className="mb-4 bg-white border rounded-md"
         placeholder="Enter your Password"
       />
-
-      {/* Toggle button for Coordinator status */}
-      <Button
-        mode="outlined"
-        onPress={() => setIsCoordinator(!isCoordinator)}
-        className="mb-4"
-      >
-        {isCoordinator ? 'You are a Coordinator' : 'You are a Normal User'}
-      </Button>
 
       {/* Login Button */}
       <Button mode="contained" onPress={handleLogin} className="mb-4">
