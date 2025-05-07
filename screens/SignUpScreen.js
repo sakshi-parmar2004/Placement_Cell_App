@@ -38,7 +38,7 @@ const SignUpScreen = ({ navigation }) => {
 
     if (result && result === 'success') {
       ToastAndroid.show('Registered successfully', ToastAndroid.SHORT);
-      navigation.navigate('Home');
+      navigation.navigate('Dashboard');
     } else {
       ToastAndroid.show('User already exists!', ToastAndroid.SHORT);
     }
