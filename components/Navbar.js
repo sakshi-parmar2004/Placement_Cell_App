@@ -63,7 +63,7 @@ const Navbar = () => {
         <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <MaterialIcons name="logout" size={25} color="#fff" />
         </TouchableOpacity>
-      </View>
+     
     </View>
   );
 };

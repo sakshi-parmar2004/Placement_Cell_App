@@ -9,10 +9,15 @@ const LoginScreen = ({ navigation }) => {
 
   // Function to handle login logic
   const handleLogin = async () => {
+    if (!id || !password) {
+      ToastAndroid.show('Enter all the fields!', ToastAndroid.SHORT);
+      return;
+    }
+  
     // Simple check to navigate to the right page
     const response = await loginUser(id, password);
     if (response != null && response === 'success') {
-      navigation.navigate('Home');
+      navigation.navigate('Dashboard');
       ToastAndroid.show('Logged in successfully', ToastAndroid.SHORT);
     } else {
       ToastAndroid.show('Incorrect Id or Password!', ToastAndroid.SHORT);
