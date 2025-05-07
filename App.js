@@ -13,7 +13,8 @@ import NotificationScreen from './screens/Notification';
 import ProfileScreen from './screens/userprofile';
 import CoordinatorProfileScreen from './screens/coordinator_profile';
 import { UserRoleProvider } from './context/AppContext';
-import HomePage from './screens/HomePage';
+import SearchScreen from './screens/SearchScreen';
+
 
 
 const Stack = createNativeStackNavigator();
@@ -31,7 +32,7 @@ export default function App() {
   <Stack.Screen name="coordinator_profile" component={CoordinatorProfileScreen} />
   <Stack.Screen name="Notification" component={NotificationScreen} />
   <Stack.Screen name="userprofile" component={ProfileScreen} />
-  <Stack.Screen name="Home" component={HomePage} />
+  <Stack.Screen name="search" component={SearchScreen} />
 
 </Stack.Navigator>
       </NavigationContainer>
