@@ -137,6 +137,64 @@ const Navbar = () => {
           </TouchableOpacity>
         </View>
       </View>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={logoutModalVisible}
+        onRequestClose={() => setLogoutModalVisible(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0,0,0,0.4)',
+          }}
+        >
+          <View
+            style={{
+              width: 280,
+              padding: 20,
+              borderRadius: 10,
+              backgroundColor: '#fff',
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{ fontSize: 18, marginBottom: 10 }}>Are you sure?</Text>
+            <Text style={{ fontSize: 14, color: '#666', marginBottom: 20 }}>
+              Do you really want to logout?
+            </Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+              <TouchableOpacity
+                onPress={() => setLogoutModalVisible(false)}
+                style={{
+                  flex: 1,
+                  padding: 10,
+                  marginRight: 10,
+                  backgroundColor: '#E0E0E0',
+                  borderRadius: 5,
+                  alignItems: 'center',
+                }}
+              >
+                <Text>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={confirmLogout}
+                style={{
+                  flex: 1,
+                  padding: 10,
+                  backgroundColor: '#FF5252',
+                  borderRadius: 5,
+                  alignItems: 'center',
+                }}
+              >
+                <Text style={{ color: '#fff' }}>Logout</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
