@@ -68,7 +68,7 @@ export default function App() {
   <Stack.Screen name="coordinator_profile" component={CoordinatorProfileScreen} />
   <Stack.Screen name="Notification" component={NotificationScreen} />
   <Stack.Screen name="userprofile" component={ProfileScreen} />
-  <Stack.Screen name="Home" component={HomePage} />
+  <Stack.Screen name="search" component={SearchScreen} />
 
 </Stack.Navigator>
       </NavigationContainer>
