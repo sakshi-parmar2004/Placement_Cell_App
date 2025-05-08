@@ -1,16 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { TextInput, View, TouchableOpacity, SafeAreaView, StatusBar, Platform } from 'react-native';
+import {
+  TextInput,
+  View,
+  TouchableOpacity,
+  SafeAreaView,
+  StatusBar,
+  Platform,
+  Modal,
+  Text,
+} from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isCoordinator, setIsCoordinator] = useState(true);
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const navigation = useNavigation();
   const route = useRoute();
-  const [isCoordinator, setIsCoordinator] = useState(true);
-
-  
 
   useEffect(() => {
     (async () => {
@@ -18,14 +26,14 @@ const Navbar = () => {
       const user = JSON.parse(userData);
       setIsCoordinator(user.isCoordinator);
     })();
-  console.log(route.name)
   }, []);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
   };
 
-  const logoutHandler = async () => {
+  const confirmLogout = async () => {
+    setLogoutModalVisible(false);
     await AsyncStorage.removeItem('user');
     await AsyncStorage.removeItem('token');
     navigation.navigate('Login');
@@ -34,8 +42,9 @@ const Navbar = () => {
   const isActive = (screenName) => route.name === screenName;
 
   return (
-    <SafeAreaView style={{ flex: 0, backgroundColor: 'transparent', width: '100%' }}>
+    <SafeAreaView style={{ flex: 0, backgroundColor: 'transparent' }}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent={true} />
+
       <View
         style={{
           flexDirection: 'row',
@@ -105,7 +114,7 @@ const Navbar = () => {
               fontSize: 11,
               color: '#424242',
             }}
-            placeholder="Search by name..."
+            placeholder="Search by Name"
             placeholderTextColor="#9E9E9E"
             value={searchQuery}
             onChangeText={handleSearch}
@@ -125,7 +134,7 @@ const Navbar = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={logoutHandler}
+            onPress={() => setLogoutModalVisible(true)}
             style={{
               marginLeft: 20,
               padding: 8,

@@ -12,7 +12,6 @@ const DashboardScreen = () => {
   const [filteredPosts, setFilteredPosts] = useState([]);
 
   useEffect(() => {
-    // Uncomment for token retrieval
     (async () => {
       const value = await getAllNotices();
       setFilteredPosts(value)

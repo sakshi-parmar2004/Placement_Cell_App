@@ -17,7 +17,6 @@ const LoginScreen = ({ navigation }) => {
         index: 0,
         routes: [{ name: 'Dashboard' }],
       });
-      
       ToastAndroid.show('Logged in successfully', ToastAndroid.SHORT);
     } else {
       ToastAndroid.show('Incorrect Id or Password!', ToastAndroid.SHORT);
