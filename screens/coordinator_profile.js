@@ -19,8 +19,11 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getMyPosts, uploadJobNotice } from '../lib/api';
 import { ActivityIndicator } from 'react-native';
+import { useNavigation } from "@react-navigation/native";
+
 
 const CoordinatorProfileScreen = () => {
+  const navigation = useNavigation();
   const [userData, setUserData] = useState({
     name: 'Jane Doe',
     id: '00000',
