@@ -94,7 +94,7 @@ const Navbar = () => {
           </TouchableOpacity>
         </View>
 
-        <View
+        {/* <View
           style={{
             flex: 1,
             marginHorizontal: 16,
@@ -107,19 +107,28 @@ const Navbar = () => {
             maxWidth: 400,
           }}
         >
-          <MaterialIcons name="search" size={14} color="#9E9E9E" style={{ marginRight: 8 }} />
-          <TextInput
-            style={{
-              flex: 1,
-              fontSize: 11,
-              color: '#424242',
-            }}
-            placeholder="Search by Name"
-            placeholderTextColor="#9E9E9E"
-            value={searchQuery}
-            onChangeText={handleSearch}
-          />
-        </View>
+          <MaterialIcons name="search" size={14} color="#9E9E9E" style={{ marginRight: 8 }} /> */}
+          <TouchableOpacity
+              onPress={() => navigation.navigate('SearchScreen')}
+              style={{
+                flex: 1,
+                marginHorizontal: 16,
+                paddingHorizontal: 16,
+                borderRadius: 25,
+                backgroundColor: '#F5F5F5',
+                flexDirection: 'row',
+                alignItems: 'center',
+                elevation: 2,
+                maxWidth: 400,
+                height: 40,
+              }}
+            >
+            <MaterialIcons name="search" size={14} color="#9E9E9E" style={{ marginRight: 8 }} />
+            <Text style={{ fontSize: 12, color: '#9E9E9E' }}>
+              Search by Name
+            </Text>
+          </TouchableOpacity>
+        {/* </View> */}
 
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity

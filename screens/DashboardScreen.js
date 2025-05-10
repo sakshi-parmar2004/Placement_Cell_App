@@ -6,8 +6,10 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '../components/Navbar';
 import { getAllNotices } from '../lib/api';
+import { useNavigation } from '@react-navigation/native';
 
 const DashboardScreen = () => {
+  const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredPosts, setFilteredPosts] = useState([]);
 
@@ -59,10 +61,12 @@ const DashboardScreen = () => {
       <Text className="text-gray-600 mt-3">{item.description || 'No description provided.'}</Text>
   
       <TouchableOpacity
-        onPress={() => Linking.openURL(item.notice_url)}
+        onPress={() => navigation.navigate('NoticeDetails', {
+          noticeId: item._id,
+        })}
         className="mt-4"
       >
-        <Text className="text-blue-600 underline">View Job Notice (Image)</Text>
+        <Text className="text-blue-600 underline">View Job Notice</Text>
       </TouchableOpacity>
   
       {item.apply_link && (

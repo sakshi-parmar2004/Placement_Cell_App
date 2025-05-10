@@ -16,8 +16,10 @@ import ProfileScreen from "./screens/userprofile";
 import CoordinatorProfileScreen from "./screens/coordinator_profile";
 import HomePage from "./screens/HomePage";
 import EditJobScreen from "./screens/EditScreen";
+import SearchScreen from "./screens/SearchScreen";
 
 import "./global.css"; // If you're using Tailwind with NativeWind or CSS via Expo
+import NoticeDetailsScreen from "./screens/NoticeDetailsScreen";
 
 // ✅ Firebase config (Web SDK version)
 const firebaseConfig = {
@@ -83,6 +85,8 @@ export default function App() {
             <Stack.Screen name="Notification" component={NotificationScreen} />
             <Stack.Screen name="userprofile" component={ProfileScreen} />
             <Stack.Screen name="EditJobScreen" component={EditJobScreen} />
+            <Stack.Screen name="NoticeDetails" component={NoticeDetailsScreen}/>
+            <Stack.Screen name="SearchScreen" component={SearchScreen} options={{ headerShown: false }}/>
           </Stack.Navigator>
         </NavigationContainer>
       </UserRoleProvider>
