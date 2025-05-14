@@ -294,19 +294,18 @@ const CoordinatorProfileScreen = () => {
   return (
     <View className="flex-1 bg-gray-100">
       <Navbar />
-      <FlatList
-        ListHeaderComponent={renderHeader}
-        data={posts}
-        keyExtractor={(item, index) => item._id || index.toString()}
-        renderItem={renderPostItem}
-        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}
-        ListEmptyComponent={
-          <Text className="text-gray-600 text-center mt-10">No job posts found.</Text>
-        }
-      />
-    </View>
-  );
   
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}>
+        {renderHeader()}
+  
+        {posts.map((item, index) => (
+          <View key={index}>
+            {renderPostItem({ item })}
+          </View>
+        ))}
+      </ScrollView>
+    </View>
+  );  
   
 };
 

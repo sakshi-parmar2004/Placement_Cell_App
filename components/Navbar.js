@@ -12,6 +12,7 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { clearToken } from '../lib/api';
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,8 +35,12 @@ const Navbar = () => {
 
   const confirmLogout = async () => {
     setLogoutModalVisible(false);
+    const userString = await AsyncStorage.getItem('user');
+    const user = JSON.parse(userString);
+    // console.log(user)
     await AsyncStorage.removeItem('user');
     await AsyncStorage.removeItem('token');
+    await clearToken(user._id);
     navigation.navigate('Login');
   };
 
