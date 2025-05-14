@@ -68,7 +68,6 @@ const CoordinatorProfileScreen = () => {
     try {
       const uri = userData.resumeUrl;
       const localUri = `${FileSystem.documentDirectory}resume.pdf`;
-
       const downloadRes = await FileSystem.downloadAsync(uri, localUri);
       if (downloadRes.status === 200 && (await Sharing.isAvailableAsync())) {
         await Sharing.shareAsync(downloadRes.uri);

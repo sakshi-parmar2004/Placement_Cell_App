@@ -41,21 +41,20 @@ const ProfileScreen = () => {
     })();
   }, []);
 
-  const handleOpenResume = async () => {
-    const uri = `http://<your-server-url>/${userData.resume}`;
-    const fileUri = `${FileSystem.documentDirectory}resume.pdf`;
-
-    try {
-      const downloadRes = await FileSystem.downloadAsync(uri, fileUri);
-      if (downloadRes.status === 200 && (await Sharing.isAvailableAsync())) {
-        await Sharing.shareAsync(downloadRes.uri);
-      } else {
-        Linking.openURL(uri); // fallback
+    const handleOpenResume = async () => {
+      try {
+        const uri = userData.resume;
+        const localUri = `${FileSystem.documentDirectory}resume.pdf`;
+        const downloadRes = await FileSystem.downloadAsync(uri, localUri);
+        if (downloadRes.status === 200 && (await Sharing.isAvailableAsync())) {
+          await Sharing.shareAsync(downloadRes.uri);
+        } else {
+          Linking.openURL(uri);
+        }
+      } catch (error) {
+        Alert.alert('Error', 'Could not open resume');
       }
-    } catch (error) {
-      Linking.openURL(uri); // fallback
-    }
-  };
+    };
 
   const formatDate = (iso) => {
     const date = new Date(iso);
